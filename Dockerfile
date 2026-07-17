@@ -23,7 +23,7 @@ RUN git clone --depth=1 https://github.com/anhnoine/n-manios.git /tmp/manios
 # ============ PATCH mnos.h ============
 RUN cd /tmp/manios \
     && sed -i '/^#include <limits.h>/a #include <dlfcn.h>' src/mnos.h \
-    && printf '/* nplugins */\ntypedef struct Val (*MnosExtFn)(struct Val *args, int nargs);\ntypedef struct { const char *name; const char *doc; MnosExtFunc func; } MnosExtFunc;\nvoid nplugins(void);\n' > /tmp/mnos_patch.h \
+    && printf '/* nplugins */\ntypedef struct Val (*MnosExtFn)(struct Val *args, int nargs);\ntypedef struct { const char *name; const char *doc; MnosExtFn func; } MnosExtFunc;\nvoid nplugins(void);\n' > /tmp/mnos_patch.h \
     && sed -i '/^#include <dlfcn.h>/r /tmp/mnos_patch.h' src/mnos.h \
     && grep -q 'MnosExtFunc' src/mnos.h && echo "[OK] mnos.h patched"
 
@@ -116,8 +116,8 @@ RUN cd /tmp/manios \
 
 # ============ PATCH mnos_main.c ============
 RUN cd /tmp/manios \
-    && sed -i '/return mnos_run_file/i nplugins();' src/mnos_main.c \
-    && grep -q 'nplugins()' src/mnos_main.c && echo "[OK] mnos_main.c patched"
+    && sed -i 's/return mnos_run_file/nplugins(); return mnos_run_file/' src/mnos_main.c \
+    && grep -q 'nplugins' src/mnos_main.c && echo "[OK] mnos_main.c patched"
 
 # ============ PATCH Makefile ============
 RUN cd /tmp/manios \
