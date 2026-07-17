@@ -108,12 +108,10 @@ closedir(d);
 }
 NPRTEOF
 
-# Patch mnos_runtime.c
+# Patch mnos_runtime.c — append nplugin code at end of file (file is minified, can't use line numbers)
 RUN cd /tmp/manios \
     && sed -i '1i#include <dlfcn.h>' src/mnos_runtime.c \
-    && LNO=$(grep -n '^void register_builtins' src/mnos_runtime.c | head -1 | cut -d: -f1) \
-    && LNO=$((LNO - 1)) \
-    && sed -i "${LNO}r /tmp/nplugin_runtime.c" src/mnos_runtime.c \
+    && cat /tmp/nplugin_runtime.c >> src/mnos_runtime.c \
     && grep -q 'nplugins()' src/mnos_runtime.c && echo "[OK] mnos_runtime.c patched"
 
 # ============ PATCH mnos_main.c ============
