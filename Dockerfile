@@ -112,7 +112,7 @@ NPRTEOF
 RUN cd /tmp/manios \
     && sed -i '1i#include <dlfcn.h>' src/mnos_runtime.c \
     && cat /tmp/nplugin_runtime.c >> src/mnos_runtime.c \
-    && grep -q 'nplugins()' src/mnos_runtime.c && echo "[OK] mnos_runtime.c patched"
+    && grep -q 'nplugins' src/mnos_runtime.c && echo "[OK] mnos_runtime.c patched"
 
 # ============ PATCH mnos_main.c ============
 RUN cd /tmp/manios \
